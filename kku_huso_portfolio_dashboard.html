@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KKU HUSO Portfolio Admission 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Marked for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Google Fonts: Prompt -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Prompt', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Markdown Styles for Chatbot */
+        .markdown-body p { margin-bottom: 0.5em; }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        .markdown-body strong { font-weight: 600; color: #1e293b; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 0.5em; }
+        .markdown-body ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 0.5em; }
+        .markdown-body li { margin-bottom: 0.25em; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ข้อมูลหลักสูตรตามประกาศ
+        const programsData = [
+            {
+                name: "สารสนเทศศาสตรบัณฑิต",
+                seats: "23",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 (หลักสูตรแกนกลาง, นานาชาติ)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.25 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีหลักฐานเชิงประจักษ์/แฟ้มสะสมผลงาน ที่แสดงให้เห็นศักยภาพด้านข้อมูลสารสนเทศ/การสื่อสาร/ดิจิทัล เช่น การผลิตสื่อ ถ่ายทำตัดต่อวิดีโอ เผยแพร่คอนเทนต์ เขียนโปรแกรม เป็นต้น",
+                    "หรือ เป็นผู้มีความสามารถได้รับรางวัลในการแข่งขันระดับประเทศขึ้นไป"
+                ]
+            },
+            {
+                name: "ศศ.บ. สาขาวิชาภาษาอังกฤษ",
+                seats: "44",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.75 ขึ้นไป",
+                    "มีทัศนคติที่ดีในการใช้ภาษาอังกฤษเพื่อการสื่อสาร และปรับตัวเข้ากับสังคมที่ใช้ภาษาอังกฤษ"
+                ],
+                criteria: [
+                    "มีผลคะแนนสอบอย่างใดอย่างหนึ่ง: KKU-AELT >= 43, TOEIC >= 665, TOEFL iBT >= 57, IELTS Academic >= 5, CU-TEP >= 53, TU-GET CBT >= 48 เป็นต้น",
+                    "มีแฟ้มสะสมผลงานภาษาอังกฤษที่เป็นผลการประกวด แข่งขัน หรือผลงานที่ใช้ภาษาอังกฤษทำประโยชน์ต่อสังคมอย่างต่อเนื่อง"
+                ]
+            },
+            {
+                name: "ศศ.บ. สาขาวิชาภาษาไทย",
+                seats: "18",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป",
+                    "ผลการเรียนกลุ่มสาระภาษาไทย 4 ภาคการศึกษา 3.50 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีผลงานทำกิจกรรมภาษาไทยที่เข้าแข่งขันระดับจังหวัดขึ้นไป เช่น พูด อ่าน เขียน ขับร้อง หมอลำ",
+                    "หรือมีผลงานภาษาไทยเผยแพร่ในช่องทางต่าง ๆ เช่น YouTube, TikTok, Vlog เป็นต้น"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาจีน",
+                seats: "แผน A: 37 คน | แผน B: 16 คน",
+                tuition: "แผน A: 15,000 บ./ภาค | แผน B: 15,000 บ.(ปี1,4) และ 15,300 หยวน/ปี(ปี2,3 ที่จีน)",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 (หลักสูตรแกนกลาง, นานาชาติ, GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบแสดงผลสอบวัดระดับความสามารถทางภาษาจีน (HSK) ระดับ 4 ขึ้นไป โดยต้องมีคะแนน 180 คะแนนขึ้นไป"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาญี่ปุ่น",
+                seats: "26",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบแสดงผลสอบวัดระดับความสามารถทางภาษาญี่ปุ่น (JLPT) ระดับ N4 ขึ้นไป",
+                    "มีเรียงความเกี่ยวกับแผนการเรียน (Study Plan)"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาเกาหลี",
+                seats: "26",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 (หลักสูตรแกนกลาง, นานาชาติ, GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบแสดงผลสอบวัดระดับความสามารถทางภาษาเกาหลี (TOPIK) ระดับ 2 ขึ้นไป"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาเยอรมัน",
+                seats: "9",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบแสดงผลสอบความสามารถภาษาเยอรมันระดับ A2 ขึ้นไป",
+                    "หากมีผลสอบระดับ A1 ต้องแสดงหลักฐานอื่นประกอบ เช่น รางวัล/ตัวแทนแข่งขันระดับจังหวัดขึ้นไป"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาสเปน",
+                seats: "14",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา หรือสำเร็จ ม.6 หรือเทียบเท่า (ศึกษาแผนศิลป์-สเปน หรือแผนการเรียนภาษาสเปน)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาสเปน 4 ภาคการศึกษา 3.50 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบรับรอง ประกาศผ่านการเรียน หรือใบแสดงผลการเรียนที่เดินทางไปแลกเปลี่ยน ณ ประเทศที่ใช้ภาษาสเปน (ถ้ามี)"
+                ]
+            },
+            {
+                name: "ศศ.บ. วิชาเอกภาษาฝรั่งเศส",
+                seats: "15",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 4 ภาคการศึกษา 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีใบแสดงผลสอบความสามารถภาษาฝรั่งเศสระดับ A2 ขึ้นไป",
+                    "หากมีผลสอบระดับ A1 ต้องแสดงหลักฐานอื่นประกอบ เช่น รางวัล/ตัวแทนแข่งขันระดับจังหวัดขึ้นไป"
+                ]
+            },
+            {
+                name: "รป.บ. สาขาวิชารัฐประศาสนศาสตร์",
+                seats: "13",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 3.75, สังคม 3.50, วิทยาศาสตร์ 3.00, คณิตศาสตร์ 3.00 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีประสบการณ์เป็นคณะกรรมการ ผู้จัดทำ ตัวแทนโรงเรียน เข้าร่วมกิจกรรมที่เกี่ยวกับสังคมศึกษา ศาสนา วัฒนธรรม โดยแนบหลักฐานเชิงประจักษ์"
+                ]
+            },
+            {
+                name: "ศศ.บ. สาขาวิชาสังคมวิทยาและมานุษยวิทยา",
+                seats: "10",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 3.00, สังคม 3.80 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีประสบการณ์ทำกิจกรรม/โครงงานเกี่ยวกับสังคมศึกษา หรือทำประโยชน์แก่สังคม เช่น วัฒนธรรม สิ่งแวดล้อม ประชาธิปไตย",
+                    "ส่งเรียงความ 'สังคมวิทยาและมานุษยวิทยาที่ฉันรู้จัก' 2-3 หน้า A4"
+                ]
+            },
+            {
+                name: "ศศ.บ. สาขาวิชาพัฒนาสังคม",
+                seats: "20",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 3.00, สังคม 3.50 ขึ้นไป"
+                ],
+                criteria: [
+                    "การเข้าร่วมกิจกรรมให้บริการสังคม หรือพัฒนาชุมชน จัดการทรัพยากร/สิ่งแวดล้อม",
+                    "ส่งเรียงความความสนใจเข้าศึกษาในสาขาวิชาพัฒนาสังคม 1 หน้า A4"
+                ]
+            },
+            {
+                name: "ศศ.บ. สาขาวิชาเอเชียตะวันออกเฉียงใต้ศึกษา",
+                seats: "15",
+                tuition: "15,000 บาท/ภาคการศึกษา",
+                qualifications: [
+                    "กำลังศึกษา ม.6 หรือสำเร็จการศึกษา ม.6 หรือเทียบเท่า (แกนกลาง, นานาชาติ, ปวช., กศน., GED)",
+                    "ผลการเรียน (GPAX) 4 ภาคการศึกษา 3.50 ขึ้นไป",
+                    "ผลการเรียนวิชาภาษาอังกฤษ 3.00, สังคม 3.50 ขึ้นไป"
+                ],
+                criteria: [
+                    "มีประสบการณ์เกี่ยวข้องตามเกณฑ์ โดยแนบหลักฐานเชิงประจักษ์ในแฟ้มสะสมผลงาน",
+                    "เตรียมนำเสนอปากเปล่า 'เอเชียตะวันออกเฉียงใต้ที่ข้าพเจ้าอยากศึกษา' ไม่เกิน 3 นาที (ในวันสอบสัมภาษณ์)"
+                ]
+            }
+        ];
+
+        // Icons components
+        const BookOpenIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+        const WalletIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>;
+        const BadgeDollarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>;
+        const CheckCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const StarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+        const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
+
+        // Chat Icons
+        const MessageCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>;
+        const SendIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>;
+        const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        const LoaderIcon = () => <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
+        const ShieldIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+        const LogOutIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+
+        // Chatbot Widget Component
+        const ChatWidget = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            
+            // Login & Consent States
+            const [userEmail, setUserEmail] = useState(null);
+            const [consentEmail, setConsentEmail] = useState(false);
+            const [consentNews, setConsentNews] = useState(false);
+            const [loginError, setLoginError] = useState("");
+            const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+            const [messages, setMessages] = useState([{ role: 'bot', content: 'สวัสดีครับ มีคำถามเกี่ยวกับการรับสมัคร Portfolio มข. คณะมนุษยศาสตร์ฯ สอบถามได้เลยครับ' }]);
+            const [input, setInput] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const messagesEndRef = useRef(null);
+
+            // --- นำ URL Web App ของ Google Apps Script มาใส่ตรงนี้ ---
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzG4uZ007jnNJpvbjYxk1qPE_kr_bwAQTok5EYrArU4d1lqPPnPBN6TYNxcJ9p4dCvw1g/exec"; 
+            // ---------------------------------------------------
+
+            // โหลด Firebase แบบ Dynamic สำหรับการทำงานของ Google Login
+            useEffect(() => {
+                const initFirebase = async () => {
+                    try {
+                        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
+                        const { getAuth, signInWithPopup, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+                        
+                        // =========================================================================
+                        // 🔴 ส่วนที่ต้องแก้ไข: ใส่การตั้งค่า Firebase ของคุณเองที่นี่ เพื่อใช้งาน Login ของจริง
+                        // =========================================================================
+                        const firebaseConfig = {
+                            apiKey: "AIzaSyDmHX2pdYdhORxzG5gDL_iaetHvhCMSFr0",
+                            authDomain: "YOUR_AUTH_DOMAIN",
+                            projectId: "YOUR_PROJECT_ID",
+                            storageBucket: "YOUR_STORAGE_BUCKET",
+                            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+                            appId: "YOUR_APP_ID"
+                        };
+                        // =========================================================================
+                        
+                        // ตรวจสอบว่าได้ใส่ค่าแล้วหรือยัง
+                        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                            const app = initializeApp(firebaseConfig);
+                            const authInstance = getAuth(app);
+                            
+                            window.firebaseAuth = authInstance;
+                            window.GoogleAuthProvider = GoogleAuthProvider;
+                            window.signInWithPopup = signInWithPopup;
+                        }
+                    } catch (e) {
+                        console.warn("Firebase warning: ", e);
+                    }
+                };
+                initFirebase();
+            }, []);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleGoogleLogin = async () => {
+                setLoginError("");
+                if (!consentEmail) {
+                    setLoginError("กรุณายอมรับเงื่อนไขการเก็บข้อมูลอีเมลเพื่อดำเนินการต่อ");
+                    return;
+                }
+                
+                setIsLoggingIn(true);
+                try {
+                    if (window.firebaseAuth && window.signInWithPopup && window.GoogleAuthProvider) {
+                        // ดำเนินการเปิดหน้าต่าง Google Login ของจริง
+                        const provider = new window.GoogleAuthProvider();
+                        const result = await window.signInWithPopup(window.firebaseAuth, provider);
+                        setUserEmail(result.user.email);
+                    } else {
+                        setLoginError("ระบบ Login ยังไม่พร้อมใช้งาน (กรุณาตั้งค่า Firebase ในโค้ด)");
+                    }
+                } catch (error) {
+                    console.error("Login error:", error);
+                    if (error.code === 'auth/popup-closed-by-user') {
+                        setLoginError("คุณได้ปิดหน้าต่างเข้าสู่ระบบไปก่อนหน้า");
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        setLoginError("โดเมนนี้ยังไม่ได้รับอนุญาตใน Firebase (กรุณาเพิ่มในเมนู Authorized domains)");
+                    } else {
+                        setLoginError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ: " + error.message);
+                    }
+                } finally {
+                    setIsLoggingIn(false);
+                }
+            };
+
+            const handleLogout = () => {
+                setUserEmail(null);
+                setMessages([{ role: 'bot', content: 'สวัสดีครับ มีคำถามเกี่ยวกับการรับสมัคร Portfolio มข. คณะมนุษยศาสตร์ฯ สอบถามได้เลยครับ' }]);
+            };
+
+            const handleSend = async (e) => {
+                e.preventDefault();
+                if (!input.trim() || isLoading) return;
+
+                const userMsg = input.trim();
+                setInput('');
+                setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+                setIsLoading(true);
+
+                try {
+                    const apiKey = ""; // The environment will provide the API Key at runtime
+                    const systemPrompt = `คุณคือผู้ช่วยตอบคำถามการรับสมัคร Portfolio ม.ขอนแก่น คณะมนุษยศาสตร์และสังคมศาสตร์ ปี 2569
+ข้อมูลที่ต้องรู้เพื่อนำไปตอบ:
+- ค่าธรรมเนียมการสมัคร: 350 บาท
+- กำหนดการที่สำคัญ: รับสมัครและส่งเอกสาร 1-10 ต.ค. 68, ชำระเงินวันสุดท้าย 11 ต.ค. 68, ประกาศรายชื่อผู้มีสิทธิ์สัมภาษณ์ 13 พ.ย. 68, สอบสัมภาษณ์ 18-19 พ.ย. 68, ประกาศตัวจริง 24 พ.ย. 68, ยืนยันสิทธิ์ Clearing House 6-7 ก.พ. 69
+- ช่องทางติดต่อ: โทร 043-009-700 ต่อ 45422-5 หรือ 089-7152002 | Email: eduhusokku@gmail.com
+- ข้อมูลสาขาที่เปิดรับ: 
+${JSON.stringify(programsData)}
+
+ตอบคำถามด้วยความสุภาพ กระชับ เป็นภาษาไทยเท่านั้น และห้ามให้ข้อมูลที่ผิดไปจากข้อเท็จจริงนี้เด็ดขาด`;
+
+                    const history = messages.slice(1).map(m => ({
+                        role: m.role === 'bot' ? 'model' : 'user',
+                        parts: [{ text: m.content }]
+                    }));
+                    history.push({ role: 'user', parts: [{ text: userMsg }] });
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: history,
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'ขออภัย เกิดข้อผิดพลาด ไม่สามารถตอบคำถามได้ในขณะนี้';
+                    
+                    setMessages(prev => [...prev, { role: 'bot', content: botReply }]);
+
+                    // --- โค้ดสำหรับส่ง Log ไปเก็บที่ Google Sheet ---
+                    if (GOOGLE_SCRIPT_URL) {
+                        try {
+                            const timestamp = new Date().toLocaleString('th-TH');
+                            
+                            // สกัดเอาเฉพาะ Text ปกติ (ลบสัญลักษณ์ ** และ tag HTML ออกทั้งหมด)
+                            const tempDiv = document.createElement("div");
+                            tempDiv.innerHTML = marked.parse(botReply);
+                            const cleanAnswer = tempDiv.textContent || tempDiv.innerText || "";
+
+                            // ส่งอีเมลและการยินยอมรับข่าวสารแนบไปด้วย
+                            fetch(GOOGLE_SCRIPT_URL, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify({
+                                    timestamp: timestamp,
+                                    email: userEmail,
+                                    consentNews: consentNews ? 'Yes' : 'No',
+                                    question: userMsg,
+                                    answer: cleanAnswer
+                                })
+                            }).catch(err => console.error("Log error:", err));
+                        } catch (logErr) {
+                            console.error("Log error:", logErr);
+                        }
+                    }
+                    // -------------------------------------------
+                    
+                } catch (error) {
+                    setMessages(prev => [...prev, { role: 'bot', content: 'ขออภัย ไม่สามารถเชื่อมต่อระบบเครือข่ายได้ในขณะนี้' }]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            return (
+                <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex flex-col items-end">
+                    {isOpen && (
+                        <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-[90vw] md:w-[380px] h-[520px] max-h-[80vh] flex flex-col mb-4 overflow-hidden transform transition-all duration-300 origin-bottom-right">
+                            {/* Chat Header */}
+                            <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-4 flex justify-between items-center shrink-0 shadow-sm z-10">
+                                <div className="flex items-center">
+                                    <div className="bg-white/20 p-1.5 rounded-full mr-3 backdrop-blur-sm">
+                                        <MessageCircleIcon />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm leading-none mb-1">ผู้ช่วย HUSO KKU</h3>
+                                        {userEmail ? (
+                                            <p className="text-[10px] text-blue-100 leading-none flex items-center gap-1">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> {userEmail}
+                                            </p>
+                                        ) : (
+                                            <p className="text-[10px] text-blue-100 leading-none">กรุณาเข้าสู่ระบบ</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {userEmail && (
+                                        <button onClick={handleLogout} className="hover:bg-blue-800/50 p-1.5 rounded-full transition-colors text-blue-100 hover:text-white" title="ออกจากระบบ">
+                                            <LogOutIcon />
+                                        </button>
+                                    )}
+                                    <button onClick={() => setIsOpen(false)} className="hover:bg-blue-800/50 p-1.5 rounded-full transition-colors">
+                                        <XIcon />
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {!userEmail ? (
+                                /* ----------------- หน้า Login & Consent ----------------- */
+                                <div className="flex-1 overflow-y-auto p-6 bg-slate-50 flex flex-col items-center justify-center text-center">
+                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                                        <ShieldIcon />
+                                    </div>
+                                    <h4 className="font-bold text-slate-800 mb-1">เข้าสู่ระบบเพื่อใช้งาน</h4>
+                                    <p className="text-xs text-slate-500 mb-6 px-4">กรุณาเข้าสู่ระบบด้วย Gmail และยอมรับเงื่อนไขเพื่อเริ่มต้นการสนทนากับ AI</p>
+                                    
+                                    <div className="text-left w-full space-y-3 mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                        <label className="flex items-start gap-3 cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={consentEmail} 
+                                                onChange={(e) => { setConsentEmail(e.target.checked); setLoginError(''); }} 
+                                                className="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 shrink-0" 
+                                            />
+                                            <span className="text-[12px] text-slate-700 leading-snug">
+                                                <strong>1.</strong> ข้าพเจ้ายินยอมให้อนุญาตให้เก็บข้อมูลอีเมลเพื่อใช้เป็นข้อมูลอ้างอิงในการใช้งานระบบแชทบอท <strong>(จำเป็น)</strong>
+                                            </span>
+                                        </label>
+                                        <hr className="border-slate-100" />
+                                        <label className="flex items-start gap-3 cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={consentNews} 
+                                                onChange={(e) => setConsentNews(e.target.checked)} 
+                                                className="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 shrink-0" 
+                                            />
+                                            <span className="text-[12px] text-slate-700 leading-snug">
+                                                <strong>2.</strong> ข้าพเจ้ายินยอมให้ใช้ในการติดต่อเพื่อแจ้งข่าวสารเกี่ยวกับหลักสูตรต่างๆ ของคณะฯ 
+                                                <span className="block text-slate-500 mt-0.5">(สามารถยกเลิกได้ภายหลังเมื่อได้รับอีเมลแจ้งข่าวสาร)</span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    {loginError && <p className="text-xs text-red-500 font-medium mb-3 bg-red-50 p-2 rounded w-full">{loginError}</p>}
+
+                                    <button 
+                                        onClick={handleGoogleLogin}
+                                        disabled={isLoggingIn}
+                                        className="w-full py-2.5 px-4 bg-white border border-slate-300 rounded-xl shadow-sm flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                                    >
+                                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                                        <span className="text-sm font-semibold text-slate-700">
+                                            {isLoggingIn ? 'กำลังเข้าสู่ระบบ...' : 'ลงชื่อเข้าใช้ด้วย Google'}
+                                        </span>
+                                    </button>
+                                </div>
+                            ) : (
+                                /* ----------------- หน้า Chat ปกติ ----------------- */
+                                <>
+                                    <div className="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-4">
+                                        {messages.map((msg, idx) => (
+                                            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                {msg.role === 'user' ? (
+                                                    <div className="max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed shadow-sm bg-blue-600 text-white rounded-br-sm">
+                                                        {msg.content.split('\n').map((line, i) => (
+                                                            <span key={i} className="block min-h-[1em]">{line}</span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div 
+                                                        className="max-w-[85%] px-4 py-3 rounded-2xl text-[14px] leading-relaxed shadow-sm bg-white border border-slate-200 text-slate-800 rounded-bl-sm markdown-body"
+                                                        dangerouslySetInnerHTML={{ __html: marked.parse(msg.content) }}
+                                                    />
+                                                )}
+                                            </div>
+                                        ))}
+                                        {isLoading && (
+                                            <div className="flex justify-start">
+                                                <div className="bg-white border border-slate-200 text-blue-600 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2">
+                                                    <LoaderIcon /> <span className="text-[13px] font-medium">กำลังพิมพ์ตอบ...</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div ref={messagesEndRef} />
+                                    </div>
+
+                                    <form onSubmit={handleSend} className="p-3 bg-white border-t border-slate-200 flex gap-2 shrink-0 items-center">
+                                        <input
+                                            type="text"
+                                            value={input}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            placeholder="พิมพ์คำถามของคุณที่นี่..."
+                                            className="flex-1 border border-slate-200 bg-slate-50 rounded-full px-4 py-2.5 text-[14px] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                                            disabled={isLoading}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={isLoading || !input.trim()}
+                                            className="bg-blue-600 text-white p-2.5 rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 disabled:cursor-not-allowed transition-colors shrink-0 shadow-sm"
+                                        >
+                                            <SendIcon />
+                                        </button>
+                                    </form>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {!isOpen && (
+                        <button
+                            onClick={() => setIsOpen(true)}
+                            className="bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-700 hover:scale-105 transition-all flex items-center justify-center relative group active:scale-95"
+                        >
+                            <MessageCircleIcon />
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm animate-bounce border-2 border-white">1</span>
+                            <div className="absolute right-full mr-4 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-medium shadow-md">
+                                มีคำถาม? สอบถามได้เลย
+                            </div>
+                        </button>
+                    )}
+                </div>
+            );
+        };
+
+        const StatCard = ({ icon, label, value }) => (
+            <div className="flex items-center p-4 bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md hover:border-blue-300">
+                <div className="p-3 bg-blue-50 text-blue-700 rounded-lg mr-4 shrink-0">
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-xs text-slate-500 font-medium mb-0.5">{label}</p>
+                    <p className="text-sm md:text-[15px] font-semibold text-slate-800 leading-snug">{value}</p>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [selectedIndex, setSelectedIndex] = useState(0);
+            const selected = programsData[selectedIndex];
+
+            return (
+                <div className="flex flex-col h-screen overflow-hidden">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md shrink-0">
+                        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center">
+                            <div className="bg-white/10 p-2.5 rounded-lg mr-4 backdrop-blur-sm">
+                                <BookOpenIcon />
+                            </div>
+                            <div>
+                                <h1 className="text-lg md:text-2xl font-bold leading-tight">ข้อมูลรับสมัคร Portfolio ปี 2569</h1>
+                                <p className="text-xs md:text-sm text-blue-100 font-medium opacity-90">คณะมนุษยศาสตร์และสังคมศาสตร์ มหาวิทยาลัยขอนแก่น</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Layout */}
+                    <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-50">
+                        
+                        {/* Mobile Dropdown */}
+                        <div className="md:hidden p-4 bg-white shadow-sm border-b border-slate-200 z-10 shrink-0">
+                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">เลือกสาขาวิชา</label>
+                            <select 
+                                className="w-full p-3 border border-blue-200 rounded-lg bg-blue-50 text-blue-900 font-medium outline-none focus:ring-2 focus:ring-blue-500 transition-shadow appearance-none"
+                                value={selectedIndex}
+                                onChange={(e) => setSelectedIndex(Number(e.target.value))}
+                            >
+                                {programsData.map((p, idx) => (
+                                    <option key={idx} value={idx}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Desktop Sidebar */}
+                        <div className="hidden md:block w-80 lg:w-[22rem] bg-white border-r border-slate-200 overflow-y-auto shrink-0 p-4">
+                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">สาขาวิชาที่เปิดรับ</h2>
+                            <div className="space-y-1.5">
+                                {programsData.map((p, idx) => (
+                                    <button 
+                                        key={idx}
+                                        onClick={() => setSelectedIndex(idx)}
+                                        className={`w-full text-left px-4 py-3.5 rounded-xl transition-all duration-200 flex items-center justify-between ${
+                                            selectedIndex === idx 
+                                            ? 'bg-blue-600 text-white shadow-md' 
+                                            : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:scale-[1.01]'
+                                        }`}
+                                    >
+                                        <span className="font-medium text-[15px]">{p.name}</span>
+                                        {selectedIndex === idx && (
+                                            <span className="w-2 h-2 rounded-full bg-white ml-2 shrink-0 animate-pulse"></span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+                            <div className="max-w-5xl mx-auto pb-10">
+                                
+                                {/* Program Title */}
+                                <div className="mb-6 flex flex-col items-start">
+                                    <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold tracking-wide mb-3">
+                                        ข้อมูลสาขาวิชา
+                                    </span>
+                                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800">{selected.name}</h2>
+                                </div>
+                                
+                                {/* Stats Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                    <StatCard icon={<UsersIcon />} label="จำนวนรับทั้งหมด" value={`${selected.seats} คน`} />
+                                    <StatCard icon={<WalletIcon />} label="อัตราค่าธรรมเนียมการศึกษา" value={selected.tuition} />
+                                    <StatCard icon={<BadgeDollarIcon />} label="อัตราค่าธรรมเนียมการสมัคร" value="350 บาท" />
+                                </div>
+
+                                {/* Qualifications & Criteria Grid */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    
+                                    {/* คุณสมบัติผู้สมัคร */}
+                                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 xl:p-8 relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                                        <h3 className="text-xl font-bold text-blue-900 flex items-center mb-5 pb-3 border-b border-slate-100">
+                                            <div className="bg-blue-100 text-blue-600 p-1.5 rounded mr-3">
+                                                <CheckCircleIcon />
+                                            </div>
+                                            คุณสมบัติผู้สมัคร
+                                        </h3>
+                                        <ul className="space-y-4">
+                                            {selected.qualifications.map((q, i) => (
+                                                <li key={i} className="flex items-start text-slate-700 leading-relaxed">
+                                                    <span className="text-blue-500 mr-3 mt-1.5 shrink-0">
+                                                        <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                                                    </span>
+                                                    <span className="text-[15px]">{q}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* เกณฑ์การคัดเลือก */}
+                                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 xl:p-8 relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                                        <h3 className="text-xl font-bold text-amber-900 flex items-center mb-5 pb-3 border-b border-slate-100">
+                                            <div className="bg-amber-100 text-amber-600 p-1.5 rounded mr-3">
+                                                <StarIcon />
+                                            </div>
+                                            เกณฑ์การคัดเลือก / Portfolio
+                                        </h3>
+                                        <ul className="space-y-4">
+                                            {selected.criteria.map((c, i) => (
+                                                <li key={i} className="flex items-start text-slate-700 leading-relaxed">
+                                                    <span className="text-amber-500 mr-3 mt-0.5 shrink-0 text-lg">★</span>
+                                                    <span className="text-[15px] font-medium">{c}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                </div>
+
+                                {/* General Info Box */}
+                                <div className="mt-8 bg-slate-800 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+                                    <svg className="absolute -right-10 -bottom-10 opacity-10 w-64 h-64" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="50"/></svg>
+                                    
+                                    <h4 className="font-bold text-lg md:text-xl mb-4 flex items-center text-blue-200">
+                                        <InfoIcon /> <span className="ml-2">เกณฑ์การสอบสัมภาษณ์ (รวม 100 คะแนน)</span>
+                                    </h4>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm md:text-[15px] text-slate-200 font-light relative z-10">
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between border-b border-slate-700 pb-2">
+                                                <span>• ความรู้และทักษะเฉพาะสาขาวิชา</span>
+                                                <span className="font-semibold text-white">40%</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-slate-700 pb-2">
+                                                <span>• ทักษะทางสารสนเทศ สื่อ และเทคโนโลยี</span>
+                                                <span className="font-semibold text-white">10%</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between border-b border-slate-700 pb-2">
+                                                <span>• ทักษะชีวิตและอาชีพ (กิจกรรม, การสื่อสาร ฯลฯ)</span>
+                                                <span className="font-semibold text-white">25%</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-slate-700 pb-2">
+                                                <span>• ทักษะการเรียนรู้ (ความรู้ทั่วไป, สร้างสรรค์)</span>
+                                                <span className="font-semibold text-white">25%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="mt-6 text-xs text-slate-400 italic text-center relative z-10">
+                                        อ้างอิงข้อมูลจากประกาศมหาวิทยาลัยขอนแก่น (ฉบับที่ 2290/2568) รอบที่ 1 (Portfolio) ประจำปีการศึกษา 2569 โครงการผู้มีศักยภาพสูง<br/>
+                                        สอบถามเพิ่มเติม: โทร 043-009-700 ต่อ 45422-5 หรือ 089-7152002 | Email: eduhusokku@gmail.com
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <ChatWidget />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
