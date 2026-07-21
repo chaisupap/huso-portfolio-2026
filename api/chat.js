@@ -1,32 +1,35 @@
-// api/chat.js
 export default async function handler(req, res) {
-    // อนุญาตให้เรียกเฉพาะวิธี POST เท่านั้น
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    // ดึง API Key จากระบบความปลอดภัยของ Vercel (คนทั่วไปจะมองไม่เห็นบรรทัดนี้)
-    const apiKey = process.env.GEMINI_API_KEY; 
-    
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return res.status(500).json({ error: 'API Key is missing on server settings' });
+        console.error("Error: GEMINI_API_KEY is missing in Vercel environment variables");
+        return res.status(500).json({ error: 'ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน Vercel' });
     }
 
-    const { contents, systemInstruction } = req.body;
-
     try {
-        // ยิงคำขอไปยัง Google Gemini API จากฝั่ง Server
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+
+        // ยิง request ไปหา Gemini API
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents, systemInstruction })
+            body: JSON.stringify(body)
         });
 
-        const data = await response.json();
-        
-        // ส่งคำตอบกลับไปที่หน้าเว็บ
-        res.status(200).json(data);
+        const data = await geminiRes.json();
+
+        // แสดงผลลัพธ์จาก Gemini ลงใน Vercel Log เพื่อให้เราคลิกดูได้
+        console.log("Gemini Status:", geminiRes.status);
+        console.log("Gemini Response Data:", JSON.stringify(data));
+
+        // ส่ง Status Code และ ข้อมูลจริงกลับไปให้หน้าเว็บ
+        return res.status(geminiRes.status).json(data);
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Server Catch Error:", error);
+        return res.status(500).json({ error: error.message });
     }
 }
